@@ -13,6 +13,7 @@ app.use(bodyParser.json());
 app.use("/api", indexRouter);
 
 const mongoURI = process.env.DB_ADDRESS;
+console.log("🚀 ~ mongoURI:", mongoURI)
 
 mongoose
 .connect(mongoURI)
