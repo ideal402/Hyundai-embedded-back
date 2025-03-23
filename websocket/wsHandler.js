@@ -37,7 +37,7 @@ function setupWebSocket(server) {
           return;
         }
         else if (parsed.type === "carState" && parsed.payload) {
-          const { isCarDoorOpen, isSunroofOpen, isACActive, isDriving } = parsed.payload;
+          const { isCarDoorOpen, isSunroofOpen, isACActive, isAnomaly } = parsed.payload;
 
           const updatedCarState = await CarState.findOneAndUpdate(
             {}, // 조건 없이 첫 문서
@@ -45,7 +45,7 @@ function setupWebSocket(server) {
               isCarDoorOpen,
               isSunroofOpen,
               isACActive,
-              isDriving
+              isAnomaly
             },
             { upsert: true, new: true } // 없으면 생성, 업데이트 후 문서 반환
           );
@@ -58,7 +58,7 @@ function setupWebSocket(server) {
                 isCarDoorOpen: updatedCarState.isCarDoorOpen,
                 isSunroofOpen: updatedCarState.isSunroofOpen,
                 isACActive: updatedCarState.isACActive,
-                isDriving: updatedCarState.isDriving
+                isAnomaly: updatedCarState.isAnomaly
               }
             }));
           }
