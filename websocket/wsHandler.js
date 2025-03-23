@@ -20,6 +20,7 @@ function setupWebSocket(server) {
         const command = msg.split(':')[1];
         if (espClient) {
           espClient.send(command);
+          console.log("🚀 ~ ws.on ~ command:", command)
         }
       }
     });
