@@ -13,8 +13,9 @@ function setupWebSocket(server) {
     console.log('WebSocket 클라이언트 연결됨');
 
     ws.on('message', async (message) => {
-
       const msg = message.toString();
+      console.log("typeof msg:", typeof msg);
+      console.log("raw msg:", msg);
       try {
         const text = typeof msg === "string" ? msg : msg.toString("utf8");
         const trimmed = text.trim();
