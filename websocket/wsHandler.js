@@ -14,6 +14,7 @@ function setupWebSocket(server) {
 
     ws.on('message', async (message) => {
       const msg = message.toString();
+      console.log("🚀 ~ ws.on ~ msg:", msg)
       try {
         const parsed = JSON.parse(msg);
 
