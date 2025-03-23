@@ -1,18 +1,19 @@
 const WebSocket = require('ws');
 const Sensor = require("../models/Sensor"); 
+const CarState = require("../models/CarState");
+
 let espClient = null;
 let webClient = null;
+let sensorBuffer = [];
 
 function setupWebSocket(server) {
   const wss = new WebSocket.Server({ server });
 
   wss.on('connection', (ws, req) => {
-    console.log('🔌 WebSocket 클라이언트 연결됨');
+    console.log('WebSocket 클라이언트 연결됨');
 
     ws.on('message', async (message) => {
       const msg = message.toString();
-      // console.log('받은 메시지:', msg);
-
       try {
         const parsed = JSON.parse(msg);
 
@@ -26,12 +27,32 @@ function setupWebSocket(server) {
             illuminance,
           });
 
-          await newSensor.save();
-          console.log("센서 데이터 저장 완료");
+          sensorBuffer.push(newSensor);
 
           // 웹 클라이언트에게 실시간 전송
           if (webClient?.readyState === WebSocket.OPEN) {
             webClient.send(JSON.stringify({ type: "sensor", payload: newSensor }));
+          }
+
+          return;
+        }
+        else if (parsed.type === "carState" && parsed.payload) {
+          const { temperature, humidity, motorSpeed, illuminance } = parsed.payload;
+
+          await CarState.findOneAndUpdate(
+            {}, // 조건 없이 첫 문서
+            {
+              isCarDoorOpen,
+              isSunroofOpen,
+              isACActive,
+              isDriving
+            },
+            { upsert: true, new: true } // 없으면 생성, 업데이트 후 문서 반환
+          );
+
+          // 웹 클라이언트에게 실시간 전송
+          if (webClient?.readyState === WebSocket.OPEN) {
+            webClient.send(JSON.stringify({ type: "carState", payload: newSensor }));
           }
 
           return;
@@ -44,7 +65,6 @@ function setupWebSocket(server) {
             webClient = ws;
             console.log("웹 클라이언트 등록됨");
           }
-          return;
         }
         else if (parsed.type === "command" && parsed.command) {
           const command = parsed.command;
@@ -53,9 +73,7 @@ function setupWebSocket(server) {
           if (espClient && espClient.readyState === WebSocket.OPEN) {
             espClient.send(command);
           }
-          return;
         }
-
       } catch (err) {
         console.warn("메시지 파싱 실패 (JSON 아님):", msg);
       }
@@ -72,6 +90,19 @@ function setupWebSocket(server) {
     });
   });
 }
+
+setInterval(async () => {
+  if (sensorBuffer.length > 0) {
+    try {
+      await Sensor.insertMany(sensorBuffer);
+      console.log(`✅ 센서 데이터 ${sensorBuffer.length}건 저장됨.`);
+      sensorBuffer = []; // 저장 후 초기화
+    } catch (err) {
+      console.error("센서 저장 실패:", err);
+    }
+  }
+}, 10000);
+
 
 function getWebClient() {
   return webClient;
