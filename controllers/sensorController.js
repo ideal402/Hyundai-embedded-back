@@ -1,5 +1,6 @@
 const sensorController = {};
 const Sensor = require("../models/Sensor");
+let lastSensorUpdateTime = null;
 
 sensorController.getData = async(req, res) => {
     try{
@@ -18,8 +19,9 @@ sensorController.postData = async(req, res) => {
         let{temperature, humidity, motorSpeed, illuminance} = req.body;
         
         const newSensor = new Sensor({temperature, humidity, motorSpeed, illuminance});
-        
         await newSensor.save();
+        
+        lastSensorUpdateTime = Date.now();
 
         res.status(200).json({status:"success"});
     }catch(error){
@@ -27,5 +29,14 @@ sensorController.postData = async(req, res) => {
     }
 }
 
+sensorController.checkConnection = (req, res) => {
+    const now = Date.now();
+    const THRESHOLD = 3000; // 3초 기준
+  
+    const connected =
+      lastSensorUpdateTime && now - lastSensorUpdateTime <= THRESHOLD;
+  
+    res.status(200).json({ connected });
+  };
 
 module.exports = sensorController;
