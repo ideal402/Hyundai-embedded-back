@@ -39,7 +39,7 @@ function setupWebSocket(server) {
         else if (parsed.type === "carState" && parsed.payload) {
           const { isCarDoorOpen, isSunroofOpen, isACActive, isDriving } = parsed.payload;
 
-          await CarState.findOneAndUpdate(
+          const updatedCarState = await CarState.findOneAndUpdate(
             {}, // 조건 없이 첫 문서
             {
               isCarDoorOpen,
@@ -49,10 +49,18 @@ function setupWebSocket(server) {
             },
             { upsert: true, new: true } // 없으면 생성, 업데이트 후 문서 반환
           );
-
-          // 웹 클라이언트에게 실시간 전송
+        
+          // 웹 클라이언트에게 최신 상태를 실시간 전송
           if (webClient?.readyState === WebSocket.OPEN) {
-            webClient.send(JSON.stringify({ type: "carState", payload: newSensor }));
+            webClient.send(JSON.stringify({
+              type: "carState",
+              payload: {
+                isCarDoorOpen: updatedCarState.isCarDoorOpen,
+                isSunroofOpen: updatedCarState.isSunroofOpen,
+                isACActive: updatedCarState.isACActive,
+                isDriving: updatedCarState.isDriving
+              }
+            }));
           }
 
           return;
