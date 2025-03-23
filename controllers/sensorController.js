@@ -1,5 +1,8 @@
 const sensorController = {};
 const Sensor = require("../models/Sensor");
+const WebSocket = require("ws");
+const { getWebClient } = require("../websocket"); 
+
 let lastSensorUpdateTime = null;
 
 sensorController.getData = async(req, res) => {
@@ -22,6 +25,7 @@ sensorController.postData = async(req, res) => {
         await newSensor.save();
         
         lastSensorUpdateTime = Date.now();
+        const webClient = getWebClient();
         if (webClient?.readyState === WebSocket.OPEN){
             webClient.send(JSON.stringify({type: "sensor", payload: newSensor}));
         }

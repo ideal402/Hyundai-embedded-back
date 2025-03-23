@@ -44,4 +44,8 @@ function setupWebSocket(server) {
   });
 }
 
-module.exports = { setupWebSocket };
+function getWebClient() {
+  return webClient;
+}
+
+module.exports = { setupWebSocket, getWebClient };
