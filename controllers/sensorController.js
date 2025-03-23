@@ -22,7 +22,7 @@ sensorController.postData = async(req, res) => {
         let{temperature, humidity, motorSpeed, illuminance} = req.body;
         
         const newSensor = new Sensor({temperature, humidity, motorSpeed, illuminance});
-        await newSensor.save();
+        // await newSensor.save();
         
         lastSensorUpdateTime = Date.now();
         const webClient = getWebClient();
