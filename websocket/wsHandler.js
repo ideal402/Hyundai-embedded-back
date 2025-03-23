@@ -11,7 +11,7 @@ function setupWebSocket(server) {
 
     ws.on('message', async (message) => {
       const msg = message.toString();
-      console.log('받은 메시지:', msg);
+      // console.log('받은 메시지:', msg);
 
       try {
         const parsed = JSON.parse(msg);
