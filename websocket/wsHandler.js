@@ -13,7 +13,7 @@ function setupWebSocket(server) {
       const msg = message.toString();
       console.log('받은 메시지:', msg);
 
-      if (msg === 'Hello from esp32') {
+      if (msg === ' Hello from esp32') {
         espClient = ws;
         console.log('ESP32 등록됨');
       } else if (msg.startsWith('command:')) {
