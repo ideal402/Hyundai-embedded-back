@@ -26,8 +26,8 @@ function setupWebSocket(server) {
             illuminance,
           });
 
-          // await newSensor.save();
-          // console.log("센서 데이터 저장 완료");
+          await newSensor.save();
+          console.log("센서 데이터 저장 완료");
 
           // 웹 클라이언트에게 실시간 전송
           if (webClient?.readyState === WebSocket.OPEN) {
