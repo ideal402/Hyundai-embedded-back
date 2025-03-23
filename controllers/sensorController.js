@@ -1,7 +1,7 @@
 const sensorController = {};
 const Sensor = require("../models/Sensor");
 const WebSocket = require("ws");
-const { getWebClient } = require("../websocket"); 
+const { getWebClient } = require("../websocket/wsHandler"); 
 
 let lastSensorUpdateTime = null;
 
