@@ -22,7 +22,9 @@ sensorController.postData = async(req, res) => {
         await newSensor.save();
         
         lastSensorUpdateTime = Date.now();
-
+        if (webClient?.readyState === WebSocket.OPEN){
+            webClient.send(JSON.stringify({type: "sensor", payload: newSensor}));
+        }
         res.status(200).json({status:"success"});
     }catch(error){
         res.status(400).json({status: "fail", error: error.message});

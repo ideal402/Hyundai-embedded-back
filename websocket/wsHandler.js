@@ -16,7 +16,12 @@ function setupWebSocket(server) {
       if (msg === 'Hello from ESP32') {
         espClient = ws;
         console.log('ESP32 등록됨');
-      } else if (msg.startsWith('command:')) {
+      }
+      else if (msg === "Hello from Web"){
+        webClient = ws;
+        console.log("web 등록됨");
+      } 
+      else if (msg.startsWith('command:')) {
         const command = msg.split(':')[1];
         console.log("🚀 ~ ws.on ~ command:", command,espClient);
         if (espClient) {
@@ -30,8 +35,12 @@ function setupWebSocket(server) {
       if (ws === espClient) {
         espClient = null;
         console.log('ESP32 연결 해제');
+      } else if (ws === webClient) {
+        webClient = null;
+        console.log('웹 클라이언트 연결 해제');
       }
     });
+    
   });
 }
 
