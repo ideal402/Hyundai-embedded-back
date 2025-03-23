@@ -36,23 +36,24 @@ function setupWebSocket(server) {
 
           return;
         }
-
-        // 클라이언트 등록 메시지 처리
-        if (msg === 'Hello from ESP32') {
-          espClient = ws;
-          console.log('ESP32 등록됨');
-        } else if (msg === "Hello from Web") {
-          webClient = ws;
-          console.log("웹 등록됨");
+        else if (parsed.type === "register") {
+          if (parsed.role === "esp32") {
+            espClient = ws;
+            console.log("ESP32 등록됨");
+          } else if (parsed.role === "web") {
+            webClient = ws;
+            console.log("웹 클라이언트 등록됨");
+          }
+          return;
         }
-
-        // 명령 메시지 처리
-        else if (msg.startsWith('command:')) {
-          const command = msg.split(':')[1];
-          console.log("📤 ESP32로 전송할 명령:", command);
+        else if (parsed.type === "command" && parsed.command) {
+          const command = parsed.command;
+          console.log("ESP32로 전송할 명령:", command);
+        
           if (espClient && espClient.readyState === WebSocket.OPEN) {
             espClient.send(command);
           }
+          return;
         }
 
       } catch (err) {
