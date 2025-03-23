@@ -13,10 +13,11 @@ function setupWebSocket(server) {
     console.log('WebSocket 클라이언트 연결됨');
 
     ws.on('message', async (message) => {
-      const text = typeof msg === "string" ? msg : msg.toString("utf8");
-      const trimmed = text.trim();
-      console.log("🚀 ~ ws.on ~ msg:", trimmed)
+
+      const msg = message.toString();
       try {
+        const text = typeof msg === "string" ? msg : msg.toString("utf8");
+        const trimmed = text.trim();
         const parsed = JSON.parse(trimmed);
 
         if (parsed.type === "sensor" && parsed.payload) {
