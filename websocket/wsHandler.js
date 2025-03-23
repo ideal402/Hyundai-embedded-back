@@ -18,9 +18,10 @@ function setupWebSocket(server) {
         console.log('ESP32 등록됨');
       } else if (msg.startsWith('command:')) {
         const command = msg.split(':')[1];
+        console.log("🚀 ~ ws.on ~ command:", command,espClient);
         if (espClient) {
           espClient.send(command);
-          console.log("🚀 ~ ws.on ~ command:", command)
+          console.log("🚀 ~ ws.on ~ command:", command);
         }
       }
     });
