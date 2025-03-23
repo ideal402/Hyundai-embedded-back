@@ -14,18 +14,8 @@ function setupWebSocket(server) {
 
     ws.on('message', async (message) => {
       const msg = message.toString();
-      console.log("typeof msg:", typeof msg);
-      console.log("raw msg:", msg);
       try {
-        const text = typeof msg === "string" ? msg.trim() : msg.toString("utf8").trim();
-
-        // 첫 번째 파싱 (문자열 내부의 JSON)
-        const firstParsed = JSON.parse(text);
-    
-        // 두 번째 파싱 (실제 JSON 오브젝트)
-        const parsed = typeof firstParsed === "string"
-          ? JSON.parse(firstParsed)
-          : firstParsed;
+        const parsed = JSON.parse(msg);
 
         if (parsed.type === "sensor" && parsed.payload) {
           const { temperature, humidity, motorSpeed, illuminance } = parsed.payload;
@@ -47,7 +37,7 @@ function setupWebSocket(server) {
           return;
         }
         else if (parsed.type === "carState" && parsed.payload) {
-          const { temperature, humidity, motorSpeed, illuminance } = parsed.payload;
+          const { isCarDoorOpen, isSunroofOpen, isACActive, isDriving } = parsed.payload;
 
           await CarState.findOneAndUpdate(
             {}, // 조건 없이 첫 문서
@@ -85,6 +75,7 @@ function setupWebSocket(server) {
           }
         }
       } catch (err) {
+        console.log("error", err);
         console.warn("메시지 파싱 실패 (JSON 아님):", msg);
       }
     });
