@@ -13,10 +13,11 @@ function setupWebSocket(server) {
     console.log('WebSocket 클라이언트 연결됨');
 
     ws.on('message', async (message) => {
-      const msg = message.toString();
-      console.log("🚀 ~ ws.on ~ msg:", msg)
+      const text = typeof msg === "string" ? msg : msg.toString("utf8");
+      const trimmed = text.trim();
+      console.log("🚀 ~ ws.on ~ msg:", trimmed)
       try {
-        const parsed = JSON.parse(msg);
+        const parsed = JSON.parse(trimmed);
 
         if (parsed.type === "sensor" && parsed.payload) {
           const { temperature, humidity, motorSpeed, illuminance } = parsed.payload;
