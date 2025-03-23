@@ -17,16 +17,15 @@ function setupWebSocket(server) {
       console.log("typeof msg:", typeof msg);
       console.log("raw msg:", msg);
       try {
-        // 디버깅용 출력    
-        console.log("📩 원본 문자열:", JSON.stringify(msg));
+        const text = typeof msg === "string" ? msg.trim() : msg.toString("utf8").trim();
 
-        // 파싱 시도
-        const clean = msg.trim();
-
-        // 숨겨진 문자 제거
-        const sanitized = clean.replace(/^[^\{]*/, '').replace(/[^\}]*$/, '');
-
-        const parsed = JSON.parse(sanitized);
+        // 첫 번째 파싱 (문자열 내부의 JSON)
+        const firstParsed = JSON.parse(text);
+    
+        // 두 번째 파싱 (실제 JSON 오브젝트)
+        const parsed = typeof firstParsed === "string"
+          ? JSON.parse(firstParsed)
+          : firstParsed;
 
         if (parsed.type === "sensor" && parsed.payload) {
           const { temperature, humidity, motorSpeed, illuminance } = parsed.payload;
