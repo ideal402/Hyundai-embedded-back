@@ -10,7 +10,8 @@ carStateController.getState = async(req, res) => {
                 isAnomaly: false,
                 isACActive: false,
                 isSunroofOpen: false,
-                isCarDoorOpen: false
+                isCarDoorOpen: false,
+                isDriving:false,
             });
 
             await latestState.save(); 
@@ -23,18 +24,18 @@ carStateController.getState = async(req, res) => {
     }
 }
 
-carStateController.postState = async(req, res) => {
-    try{
-        let{isAnomaly,isACActive,isSunroofOpen,isCarDoorOpen} = req.body;
+// carStateController.postState = async(req, res) => {
+//     try{
+//         let{isAnomaly,isACActive,isSunroofOpen,isCarDoorOpen} = req.body;
 
-        const newState = new CarState({isAnomaly,isACActive,isSunroofOpen,isCarDoorOpen});
+//         const newState = new CarState({isAnomaly,isACActive,isSunroofOpen,isCarDoorOpen});
 
-        await newState.save();
+//         await newState.save();
 
-        res.status(200).json({status:"success", data: newState});
-    }catch(error){
-        res.status(400).json({status:"fail", error: error.message});
-    }
-}
+//         res.status(200).json({status:"success", data: newState});
+//     }catch(error){
+//         res.status(400).json({status:"fail", error: error.message});
+//     }
+// }
 
 module.exports = carStateController;
