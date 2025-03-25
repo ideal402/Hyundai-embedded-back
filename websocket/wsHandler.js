@@ -5,6 +5,33 @@ const CarState = require("../models/CarState");
 let espClient = null;
 let webClient = null;
 let sensorBuffer = [];
+let totalMileage = 0;
+
+(async () => {
+  try {
+    const lastSensor = await Sensor.findOne().sort({ createdAt: -1 });
+    if (lastSensor?.mileage) {
+      totalMileage = lastSensor.mileage;
+      console.log(`이전 주행거리 불러옴: ${totalMileage.toFixed(2)} km`);
+    }
+  } catch (err) {
+    console.error("이전 주행거리 불러오기 실패:", err);
+  }
+})();
+
+function convertToSpeed(potValue) {
+  const potMin = 0;
+  const potMax = 326;
+  const speedMin = 0;
+  const speedMax = 200;
+
+  // 범위 내로 제한
+  potValue = Math.max(potMin, Math.min(potValue, potMax));
+
+  // 비율 계산 후 변환 (정수로 반올림)
+  const speed = ((potValue - potMin) / (potMax - potMin)) * (speedMax - speedMin) + speedMin;
+  return Math.round(speed);
+}
 
 function setupWebSocket(server) {
   const wss = new WebSocket.Server({ server });
@@ -18,13 +45,18 @@ function setupWebSocket(server) {
         const parsed = JSON.parse(msg);
 
         if (parsed.type === "sensor" && parsed.payload) {
-          const { temperature, humidity, motorSpeed, illuminance } = parsed.payload;
+          const { temperature, humidity, motorSpeedRaw, illuminance, vib } = parsed.payload;
+          
+          const motorSpeed = convertToSpeed(motorSpeedRaw);
 
+          totalMileage += motorSpeed / 3600;
+          
           const newSensor = new Sensor({
             temperature,
             humidity,
             motorSpeed,
             illuminance,
+            mileage: Number(totalMileage.toFixed(2))
           });
 
           sensorBuffer.push(newSensor);
@@ -106,7 +138,7 @@ setInterval(async () => {
   if (sensorBuffer.length > 0) {
     try {
       await Sensor.insertMany(sensorBuffer);
-      console.log("센서 데이터 ${sensorBuffer.length}건 저장됨.");
+      console.log(`센서 데이터 ${sensorBuffer.length}건 저장됨.`);
       sensorBuffer = []; // 저장 후 초기화
     } catch (err) {
       console.error("센서 저장 실패:", err);
