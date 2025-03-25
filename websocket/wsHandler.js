@@ -19,6 +19,15 @@ let totalMileage = 0;
   }
 })();
 
+function sendStartCommandWithDelay() {
+  if (espClient && espClient.readyState === WebSocket.OPEN) {
+    setTimeout(() => {
+      console.log("🟢 start 명령 전송됨");
+      espClient.send("start");
+    }, 2000);
+  }
+}
+
 function convertToSpeed(potValue) {
   const potMin = 0;
   const potMax = 326;
@@ -103,13 +112,17 @@ function setupWebSocket(server) {
           if (parsed.role === "esp32") {
             espClient = ws;
             console.log("ESP32 등록됨");
-            espClient.send("start");
+            
+            if (webClient && webClient.readyState === WebSocket.OPEN) {
+              sendStartCommandWithDelay();
+            }
 
           } else if (parsed.role === "web") {
             webClient = ws;
             console.log("웹 클라이언트 등록됨");
             
             if (espClient && espClient.readyState === WebSocket.OPEN) {
+              console.log("🟢 start 명령 전송됨");
               espClient.send("start");
             }
           }
