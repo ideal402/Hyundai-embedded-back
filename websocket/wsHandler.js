@@ -105,9 +105,23 @@ function setupWebSocket(server) {
           if (parsed.role === "esp32") {
             espClient = ws;
             console.log("ESP32 등록됨");
+
+            // 웹 클라이언트가 연결되어 있다면 상태 전송
+            if (webClient && webClient.readyState === WebSocket.OPEN) {
+              webClient.send(JSON.stringify({
+                type: "status",
+                esp32_connected: true
+              }));
+            }
+            
           } else if (parsed.role === "web") {
             webClient = ws;
             console.log("웹 클라이언트 등록됨");
+            
+            webClient.send(JSON.stringify({
+              type: "status",
+              esp32_connected: espClient !== null && espClient.readyState === WebSocket.OPEN
+            }));
           }
         }
         else if (parsed.type === "command" && parsed.command) {
