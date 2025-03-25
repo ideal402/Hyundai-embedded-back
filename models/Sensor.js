@@ -6,6 +6,7 @@ const sensorSchema = Schema({
     humidity: {type: Number, required: true},
     motorSpeed: {type: Number, required: true},
     illuminance: {type: Number, required: true},
+    mileage: {type:Number, required: true},
 },
 {timestamps: true}
 );

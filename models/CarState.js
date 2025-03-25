@@ -7,6 +7,7 @@ const carStateSchema = Schema({
     isSunroofOpen: {type: Boolean, required: true},
     isCarDoorOpen: {type: Boolean, required: true},
     isDriving: {type: Boolean, required: true},
+    isActive: {type: Boolean, required: true},
 },
 {timestamps: true}
 );
