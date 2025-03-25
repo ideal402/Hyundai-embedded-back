@@ -71,6 +71,7 @@ function setupWebSocket(server) {
           sensorBuffer.push(newSensor);
 
           newSensor.vib = vib;
+          console.log("🚀 ~ ws.on ~ newSensor:", newSensor)
           
           // 웹 클라이언트에게 실시간 전송
           if (webClient?.readyState === WebSocket.OPEN) {
