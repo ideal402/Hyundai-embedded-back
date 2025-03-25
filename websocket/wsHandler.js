@@ -48,6 +48,7 @@ function setupWebSocket(server) {
           const { temperature, humidity, motorSpeedRaw, illuminance, vib } = parsed.payload;
           
           const motorSpeed = convertToSpeed(motorSpeedRaw);
+          console.log("🚀 ~ ws.on ~ motorSpeed:", motorSpeed)
 
           totalMileage += motorSpeed / 3600;
           
@@ -58,6 +59,7 @@ function setupWebSocket(server) {
             illuminance,
             mileage: Number(totalMileage.toFixed(2))
           });
+          console.log("🚀 ~ ws.on ~ newSensor:", newSensor)
 
           sensorBuffer.push(newSensor);
 
