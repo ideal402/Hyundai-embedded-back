@@ -34,6 +34,7 @@ function sendStartCommandWithDelay() {
     setTimeout(() => {
       console.log("🟢 start 명령 전송됨");
       espClient.send("start");
+      espClient.send("toggle_ac");
     }, 2000);
   }
 }
