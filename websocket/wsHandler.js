@@ -64,8 +64,7 @@ function setupWebSocket(server) {
         const parsed = JSON.parse(msg);
 
         if (parsed.type === "sensor" && parsed.payload) {
-          const { temperature, humidity, motorSpeedRaw, illuminance, vib } = parsed.payload;
-          console.log("🚀 ~ ws.on ~ vib:", vib)
+          const { temperature, humidity, motorSpeedRaw, illuminance, vibration } = parsed.payload;
           
           const motorSpeed = convertToSpeed(motorSpeedRaw);
 
@@ -86,7 +85,7 @@ function setupWebSocket(server) {
             type: "sensor",
             payload: {
               ...newSensor.toObject(),
-              vib
+              vibration
             }
           });
 
