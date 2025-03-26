@@ -3,7 +3,7 @@ const Sensor = require("../models/Sensor");
 const CarState = require("../models/CarState");
 
 let espClient = null;
-let webClient = null;
+const webClients = new Set();
 let sensorBuffer = [];
 let totalMileage = 0;
 
@@ -18,6 +18,16 @@ let totalMileage = 0;
     console.error("이전 주행거리 불러오기 실패:", err);
   }
 })();
+
+function broadcastToWebClients(message) {
+  const msgString = JSON.stringify(message);
+
+  for (const client of webClients) {
+    if (client.readyState === WebSocket.OPEN) {
+      client.send(msgString);
+    }
+  }
+}
 
 function sendStartCommandWithDelay() {
   if (espClient && espClient.readyState === WebSocket.OPEN) {
@@ -71,9 +81,7 @@ function setupWebSocket(server) {
           sensorBuffer.push(newSensor);
 
           // 웹 클라이언트에게 실시간 전송
-          if (webClient?.readyState === WebSocket.OPEN) {
-            webClient.send(JSON.stringify({ type: "sensor", payload: {newSensor, vib} }));
-          }
+          broadcastToWebClients((JSON.stringify({ type: "sensor", payload: {newSensor, vib} })));
 
           return;
         }
@@ -93,18 +101,16 @@ function setupWebSocket(server) {
           );
         
           // 웹 클라이언트에게 최신 상태를 실시간 전송
-          if (webClient?.readyState === WebSocket.OPEN) {
-            webClient.send(JSON.stringify({
-              type: "carState",
-              payload: {
-                isCarDoorOpen: updatedCarState.isCarDoorOpen,
-                isSunroofOpen: updatedCarState.isSunroofOpen,
-                isACActive: updatedCarState.isACActive,
-                isDriving: updatedCarState.isDriving,
-                isAnomaly: updatedCarState.isAnomaly
-              }
-            }));
-          }
+          broadcastToWebClients({
+            type: "carState",
+            payload: {
+              isCarDoorOpen: updatedCarState.isCarDoorOpen,
+              isSunroofOpen: updatedCarState.isSunroofOpen,
+              isACActive: updatedCarState.isACActive,
+              isDriving: updatedCarState.isDriving,
+              isAnomaly: updatedCarState.isAnomaly
+            }
+          });
 
           return;
         }
@@ -118,7 +124,7 @@ function setupWebSocket(server) {
             }
 
           } else if (parsed.role === "web") {
-            webClient = ws;
+            webClients.add(ws);
             console.log("웹 클라이언트 등록됨");
             
             if (espClient && espClient.readyState === WebSocket.OPEN) {
