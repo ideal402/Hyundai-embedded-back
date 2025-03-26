@@ -136,7 +136,6 @@ function setupWebSocket(server) {
             
             if (espClient && espClient.readyState === WebSocket.OPEN) {
               console.log("🟢 start 명령 전송됨");
-              espClient.send("start");
             }
           }
         }
