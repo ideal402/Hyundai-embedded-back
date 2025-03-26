@@ -119,7 +119,7 @@ function setupWebSocket(server) {
             espClient = ws;
             console.log("ESP32 등록됨");
             
-            if (webClient && webClient.readyState === WebSocket.OPEN) {
+            if (webClients.size > 0) {
               sendStartCommandWithDelay();
             }
 
@@ -151,8 +151,8 @@ function setupWebSocket(server) {
       if (ws === espClient) {
         espClient = null;
         console.log('ESP32 연결 해제');
-      } else if (ws === webClient) {
-        webClient = null;
+      } else if (webClients.has(ws)) {
+        webClients.delete(ws);
         console.log('웹 클라이언트 연결 해제');
       }
     });
@@ -172,8 +172,5 @@ setInterval(async () => {
 }, 10000);
 
 
-function getWebClient() {
-  return webClient;
-}
 
-module.exports = { setupWebSocket, getWebClient };
+module.exports = { setupWebSocket };
