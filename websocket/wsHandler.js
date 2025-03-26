@@ -66,14 +66,13 @@ function setupWebSocket(server) {
             motorSpeed,
             illuminance,
             mileage: Number(totalMileage.toFixed(2)),
-            vib,
           });
 
           sensorBuffer.push(newSensor);
 
           // 웹 클라이언트에게 실시간 전송
           if (webClient?.readyState === WebSocket.OPEN) {
-            webClient.send(JSON.stringify({ type: "sensor", payload: newSensor }));
+            webClient.send(JSON.stringify({ type: "sensor", payload: {newSensor, vib} }));
           }
 
           return;
