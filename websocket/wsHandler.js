@@ -81,7 +81,13 @@ function setupWebSocket(server) {
           sensorBuffer.push(newSensor);
 
           // 웹 클라이언트에게 실시간 전송
-          broadcastToWebClients((JSON.stringify({ type: "sensor", payload: {newSensor, vib} })));
+          broadcastToWebClients({
+            type: "sensor",
+            payload: {
+              ...newSensor.toObject(),
+              vib
+            }
+          });
 
           return;
         }
